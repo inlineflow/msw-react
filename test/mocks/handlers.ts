@@ -21,6 +21,10 @@ const users = [
 ];
 
 export const handlers = [
+  http.get("/users/avatars", () => {
+    const resp = HttpResponse.json<UserAvatarScale[]>([0.1, 0.2, 0.1, 0.3]);
+    return resp;
+  }),
   http.get<{ id: string }, never, User>("/users/:id", ({ params }) => {
     const { id } = params;
     const userId = parseInt(id);
@@ -29,10 +33,5 @@ export const handlers = [
       throw new Error("Non existing user, index < 0");
     }
     return HttpResponse.json(users[index]);
-  }),
-  http.get("/users/avatars", () => {
-    console.log("--- MSW Mock for /users/avatars was HIT! ---");
-    const resp = HttpResponse.json<UserAvatarScale[]>([0.1, 0.2, 0.1, 0.3]);
-    return resp;
   }),
 ];
