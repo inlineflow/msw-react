@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import type { UserAvatarScale } from "../types/user";
 
 const Context = createContext({
@@ -13,6 +13,17 @@ export const UserGalleryProvider = ({ children }: UserGalleryProvider) => {
   const [userAvatarScales, setUserAvatarScales] = useState(
     [] as UserAvatarScale[]
   );
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const res = await fetch("/users/avatars");
+      const result = (await res.json()) as UserAvatarScale[];
+
+      setUserAvatarScales(result);
+    };
+
+    fetchUsers();
+  }, []);
+
   const value = {
     userAvatarScales,
     setUserAvatarScales,
@@ -20,3 +31,5 @@ export const UserGalleryProvider = ({ children }: UserGalleryProvider) => {
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
 };
+
+export const useGalleryContext = () => useContext(Context);
