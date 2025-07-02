@@ -82,6 +82,6 @@ describe("UserProfile", () => {
     render(<UserProfile id={1} />);
     await waitFor(() => expect(dispatchRequest).toHaveBeenCalledTimes(1));
     userEvent.click(await screen.findByText("Next User"));
-    await waitFor(() => expect(dispatchRequest).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(dispatchRequest).toHaveBeenCalledTimes(2));
   });
 });
