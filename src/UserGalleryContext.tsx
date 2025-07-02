@@ -13,10 +13,12 @@ export const UserGalleryProvider = ({ children }: UserGalleryProvider) => {
   const [userAvatarScales, setUserAvatarScales] = useState(
     [] as UserAvatarScale[]
   );
+
   useEffect(() => {
     const fetchUsers = async () => {
+      console.log("Starting request");
       const res = await fetch("/users/avatars");
-      const result = (await res.json()) as UserAvatarScale[];
+      const result = await res.json();
 
       setUserAvatarScales(result);
     };

@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw";
-import { User } from "../../types/user";
+import { User, UserAvatarScale } from "../../types/user";
 
 const users = [
   {
@@ -29,5 +29,10 @@ export const handlers = [
       throw new Error("Non existing user, index < 0");
     }
     return HttpResponse.json(users[index]);
+  }),
+  http.get("/users/avatars", () => {
+    console.log("--- MSW Mock for /users/avatars was HIT! ---");
+    const resp = HttpResponse.json<UserAvatarScale[]>([0.1, 0.2, 0.1, 0.3]);
+    return resp;
   }),
 ];

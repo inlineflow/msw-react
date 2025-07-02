@@ -22,8 +22,6 @@ describe("MSW", () => {
 
     const resp = await fetch("/users/1");
 
-    console.log(dispatchRequest.mock.calls);
-
     expect(dispatchRequest).toHaveBeenCalledTimes(1);
   });
 
@@ -34,8 +32,6 @@ describe("MSW", () => {
     const resp1 = await fetch("/users/1");
     const resp2 = await fetch("/users/1");
     const resp3 = await fetch("/users/1");
-
-    console.log(dispatchRequest.mock.calls);
 
     expect(dispatchRequest).toHaveBeenCalledTimes(3);
   });

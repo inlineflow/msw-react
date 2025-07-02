@@ -23,7 +23,7 @@ import { User } from "../types/user";
 
 describe("UserProfile", () => {
   beforeEach(() => {
-    server.resetHandlers();
+    // server.resetHandlers();
   });
 
   afterEach(() => {
