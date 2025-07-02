@@ -20,10 +20,6 @@ describe("UserGallery", () => {
       expect(UserAvatar).toHaveBeenCalled();
     });
 
-    // waitFor(() => {
-    //   expect(screen.findAllByText("0.1")).not.toBeNull();
-    // });
-    expect(UserAvatar).toHaveBeenCalledTimes(4);
-    // expect(UserAvatar).toHaveBeenCalledTimes(3);
+    await expect(UserAvatar).toHaveBeenCalledTimes(4);
   });
 });
