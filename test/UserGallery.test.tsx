@@ -22,4 +22,6 @@ describe("UserGallery", () => {
 
     await expect(UserAvatar).toHaveBeenCalledTimes(4);
   });
+
+  test("");
 });
