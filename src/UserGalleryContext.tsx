@@ -1,22 +1,27 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { UserAvatarScale } from "../types/user";
 
-const Context = createContext({
+const UserGalleryDataContext = createContext({
   userAvatarScales: [] as UserAvatarScale[],
-  setUserAvatarScales: ([]: UserAvatarScale[]) => {},
+  // setUserAvatarScales: ([]: UserAvatarScale[]) => {},
 });
+
+type Actions = { type: "update" };
+
+const delay = async (ms: number | undefined) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 type UserGalleryProvider = {
   children: React.ReactNode;
 };
-export const UserGalleryProvider = ({ children }: UserGalleryProvider) => {
+export const UserGalleryDataProvider = ({ children }: UserGalleryProvider) => {
   const [userAvatarScales, setUserAvatarScales] = useState(
     [] as UserAvatarScale[]
   );
 
   useEffect(() => {
     const fetchUsers = async () => {
-      console.log("Starting request");
       const res = await fetch("/users/avatars");
       const result = await res.json();
 
@@ -28,10 +33,14 @@ export const UserGalleryProvider = ({ children }: UserGalleryProvider) => {
 
   const value = {
     userAvatarScales,
-    setUserAvatarScales,
+    // setUserAvatarScales,
   };
 
-  return <Context.Provider value={value}>{children}</Context.Provider>;
+  return (
+    <UserGalleryDataContext.Provider value={value}>
+      {children}
+    </UserGalleryDataContext.Provider>
+  );
 };
 
-export const useGalleryContext = () => useContext(Context);
+export const useGalleryContext = () => useContext(UserGalleryDataContext);

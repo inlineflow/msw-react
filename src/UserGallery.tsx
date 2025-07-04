@@ -4,8 +4,6 @@ import { useGalleryContext } from "./UserGalleryContext";
 
 export const UserGallery = () => {
   const { userAvatarScales } = useGalleryContext();
-  console.log("rendering user gallery");
-  console.log(userAvatarScales);
 
   return (
     <div>
