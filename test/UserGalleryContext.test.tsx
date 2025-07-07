@@ -11,6 +11,7 @@ import {
   useUserGalleryData,
   UserGalleryProvider,
 } from "../src/UserGalleryContext";
+import * as UserFetcherModule from "../src/UserFetcher";
 import { UserGallery } from "../src/UserGallery";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -35,7 +36,6 @@ const delay = async (ms: number | undefined) => {
 describe("UserGalleryContext", () => {
   afterEach(() => {
     cleanup();
-    // vi.restoreAllMocks();
   });
 
   test("renders user gallery with default fetched value", async () => {
@@ -96,7 +96,23 @@ describe("UserGalleryContext", () => {
     await waitFor(() => {
       expect(MockDataContextConsumer).toHaveBeenCalled();
     });
+
     expect(MockDataContextConsumer).toHaveBeenCalledTimes(2);
+  });
+
+  test("Spy works", async () => {
+    const userFetcherSpy = vi.spyOn(UserFetcherModule, "UserFetcher");
+    render(
+      <UserGalleryProvider>
+        <UserGallery />
+      </UserGalleryProvider>
+    );
+
+    expect(userFetcherSpy.mock.calls.length).toBe(1);
+    userEvent.click(await screen.getByText("New Users"));
+    await waitFor(() => {
+      expect(userFetcherSpy.mock.calls.length).toBe(1);
+    });
   });
 
   // test("re-renders all consumers when it re-renders", async () => {
