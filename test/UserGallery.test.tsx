@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
-import { UserGalleryDataProvider } from "../src/UserGalleryContext";
+import { UserGalleryProvider } from "../src/UserGalleryContext";
 import { UserGallery } from "../src/UserGallery";
 import { UserAvatar } from "../src/UserAvatar";
 import { server } from "./mocks/node";
@@ -16,9 +16,9 @@ describe("UserGallery", () => {
       await fetch("/users/avatars")
     ).json()) as UserAvatarScale[];
     render(
-      <UserGalleryDataProvider>
+      <UserGalleryProvider>
         <UserGallery />
-      </UserGalleryDataProvider>
+      </UserGalleryProvider>
     );
 
     await waitFor(() => {

@@ -1,10 +1,18 @@
-import { describe, expect, Mock, test, vi } from "vitest";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  Mock,
+  test,
+  vi,
+} from "vitest";
 import {
   useUserGalleryData,
-  UserGalleryDataProvider,
+  UserGalleryProvider,
 } from "../src/UserGalleryContext";
 import { UserGallery } from "../src/UserGallery";
-import { render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { UserAvatarScale } from "../types/user";
 
@@ -12,30 +20,37 @@ const printNumberOfCalls = (func: Mock) => {
   console.log(func.mock.calls.length);
 };
 
-const MockContextConsumer = vi.fn(() => {
+const MockDataContextConsumer = vi.fn(() => {
   const { userAvatarScales } = useUserGalleryData();
 
   return <UserGallery />;
 });
+
+const MockComponent = vi.fn(() => <UserGallery />);
 
 const delay = async (ms: number | undefined) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 describe("UserGalleryContext", () => {
+  afterEach(() => {
+    cleanup();
+    // vi.restoreAllMocks();
+  });
+
   test("renders user gallery with default fetched value", async () => {
     const scales = (await (
       await fetch("/users/avatars")
     ).json()) as UserAvatarScale[];
 
     render(
-      <UserGalleryDataProvider>
-        <MockContextConsumer />
-      </UserGalleryDataProvider>
+      <UserGalleryProvider>
+        <MockDataContextConsumer />
+      </UserGalleryProvider>
     );
 
     await waitFor(() => {
-      expect(MockContextConsumer).toHaveBeenCalled();
+      expect(MockDataContextConsumer).toHaveBeenCalled();
     });
 
     const actual = Array.from(document.querySelectorAll("li")).map(
@@ -44,7 +59,44 @@ describe("UserGalleryContext", () => {
 
     expect(scales.map((s) => s.toString())).toEqual(actual);
 
-    screen.debug();
+    // screen.debug();
+  });
+
+  test("Component doesn't re-render if it's not a context consumer", async () => {
+    render(
+      <UserGalleryProvider>
+        <MockComponent />
+      </UserGalleryProvider>
+    );
+
+    await waitFor(() => {
+      expect(MockComponent).toHaveBeenCalled();
+    });
+
+    userEvent.click(await screen.findByText("New Users"));
+    await waitFor(() => {
+      expect(MockComponent).toHaveBeenCalledTimes(1);
+    });
+
+    userEvent.click(await screen.findByText("New Users"));
+    await waitFor(() => {
+      expect(MockComponent).toHaveBeenCalledTimes(1);
+    });
+
+    expect(MockComponent.mock.calls.length).toBe(1);
+  });
+
+  test("Component does re-render if it's a context consumer", async () => {
+    render(
+      <UserGalleryProvider>
+        <MockDataContextConsumer />
+      </UserGalleryProvider>
+    );
+
+    await waitFor(() => {
+      expect(MockDataContextConsumer).toHaveBeenCalled();
+    });
+    expect(MockDataContextConsumer).toHaveBeenCalledTimes(2);
   });
 
   // test("re-renders all consumers when it re-renders", async () => {

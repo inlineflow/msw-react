@@ -17,7 +17,10 @@ type API = {
   onUpdateUserAchievements: (achievements: string[]) => void;
 };
 
-const UserGalleryDataContext = createContext({} as State);
+const UserGalleryDataContext = createContext<State>({
+  userAvatarScales: [],
+  userAchievements: [],
+});
 const UserGalleryAPIContext = createContext({} as API);
 
 type Actions =
@@ -36,8 +39,11 @@ const reducer = (state: State, action: Actions): State => {
 type Provider = {
   children: React.ReactNode;
 };
-export const UserGalleryDataProvider = ({ children }: Provider) => {
-  const [state, dispatch] = useReducer(reducer, {} as State);
+export const UserGalleryProvider = ({ children }: Provider) => {
+  const [state, dispatch] = useReducer(reducer, {
+    userAvatarScales: [],
+    userAchievements: [],
+  });
 
   const api = useMemo(() => {
     const onUpdateUserAvatarScales = (scales: UserAvatarScale[]) =>
