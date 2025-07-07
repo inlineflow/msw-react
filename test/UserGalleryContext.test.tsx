@@ -101,7 +101,7 @@ describe("UserGalleryContext", () => {
     expect(MockDataContextConsumer).toHaveBeenCalledTimes(2);
   });
 
-  test("Spy works", async () => {
+  test("Components using the Context API don't re-render on Data Context changes", async () => {
     const userFetcherSpy = vi.spyOn(UserFetcherModule, "UserFetcher");
     render(
       <UserGalleryProvider>
@@ -111,6 +111,12 @@ describe("UserGalleryContext", () => {
     );
 
     expect(userFetcherSpy.mock.calls.length).toBe(1);
+    userEvent.click(await screen.getByText("New Users"));
+    await waitFor(() => {
+      expect(userFetcherSpy).toBeCalled();
+      expect(userFetcherSpy.mock.calls.length).toBe(1);
+    });
+
     userEvent.click(await screen.getByText("New Users"));
     await waitFor(() => {
       expect(userFetcherSpy).toBeCalled();
