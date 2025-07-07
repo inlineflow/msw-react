@@ -1,46 +1,72 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+} from "react";
 import type { UserAvatarScale } from "../types/user";
 
-const UserGalleryDataContext = createContext({
-  userAvatarScales: [] as UserAvatarScale[],
-  // setUserAvatarScales: ([]: UserAvatarScale[]) => {},
-});
-
-type Actions = { type: "update" };
-
-const delay = async (ms: number | undefined) => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+type State = {
+  userAvatarScales: UserAvatarScale[];
+  userAchievements: string[];
 };
 
-type UserGalleryProvider = {
+type API = {
+  onUpdateUserAvatarScales: (scales: UserAvatarScale[]) => void;
+  onUpdateUserAchievements: (achievements: string[]) => void;
+};
+
+const UserGalleryDataContext = createContext({} as State);
+const UserGalleryAPIContext = createContext({} as API);
+
+type Actions =
+  | { type: "updateUserAvatarScales"; scales: UserAvatarScale[] }
+  | { type: "updateUserAchievements"; achievements: string[] };
+
+const reducer = (state: State, action: Actions): State => {
+  switch (action.type) {
+    case "updateUserAvatarScales":
+      return { ...state, userAvatarScales: action.scales };
+    case "updateUserAchievements":
+      return { ...state, userAchievements: action.achievements };
+  }
+};
+
+type Provider = {
   children: React.ReactNode;
 };
-export const UserGalleryDataProvider = ({ children }: UserGalleryProvider) => {
-  const [userAvatarScales, setUserAvatarScales] = useState(
-    [] as UserAvatarScale[]
-  );
-
+export const UserGalleryDataProvider = ({ children }: Provider) => {
+  const [state, dispatch] = useReducer(reducer, {} as State);
   useEffect(() => {
     const fetchUsers = async () => {
       const res = await fetch("/users/avatars");
       const result = await res.json();
 
-      setUserAvatarScales(result);
+      dispatch({ type: "updateUserAvatarScales", scales: result });
     };
 
     fetchUsers();
   }, []);
 
-  const value = {
-    userAvatarScales,
-    // setUserAvatarScales,
-  };
+  const api = useMemo(() => {
+    const onUpdateUserAvatarScales = (scales: UserAvatarScale[]) =>
+      dispatch({ type: "updateUserAvatarScales", scales: scales });
+    const onUpdateUserAchievements = (achievements: string[]) =>
+      dispatch({ type: "updateUserAchievements", achievements: achievements });
+
+    return { onUpdateUserAvatarScales, onUpdateUserAchievements };
+  }, []);
 
   return (
-    <UserGalleryDataContext.Provider value={value}>
-      {children}
-    </UserGalleryDataContext.Provider>
+    <UserGalleryAPIContext.Provider value={api}>
+      <UserGalleryDataContext.Provider value={state}>
+        {children}
+      </UserGalleryDataContext.Provider>
+    </UserGalleryAPIContext.Provider>
   );
 };
 
-export const useGalleryContext = () => useContext(UserGalleryDataContext);
+export const useUserGalleryData = () => useContext(UserGalleryDataContext);
+// TODO: fix stub
+export const useUserGalleryAPI = () => useContext(UserGalleryAPIContext);

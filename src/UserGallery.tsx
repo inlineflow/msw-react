@@ -1,9 +1,9 @@
 import { UserAvatar } from "./UserAvatar";
 import { UserFetcher } from "./UserFetcher";
-import { useGalleryContext } from "./UserGalleryContext";
+import { useUserGalleryData } from "./UserGalleryContext";
 
 export const UserGallery = () => {
-  const { userAvatarScales } = useGalleryContext();
+  const { userAvatarScales } = useUserGalleryData();
 
   return (
     <div>

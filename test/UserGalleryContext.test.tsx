@@ -1,6 +1,6 @@
 import { describe, expect, Mock, test, vi } from "vitest";
 import {
-  useGalleryContext,
+  useUserGalleryData,
   UserGalleryDataProvider,
 } from "../src/UserGalleryContext";
 import { UserGallery } from "../src/UserGallery";
@@ -12,10 +12,14 @@ const printNumberOfCalls = (func: Mock) => {
 };
 
 const MockContextConsumer = vi.fn(() => {
-  const { userAvatarScales } = useGalleryContext();
+  const { userAvatarScales } = useUserGalleryData();
 
   return <UserGallery />;
 });
+
+const delay = async (ms: number | undefined) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 describe("UserGalleryContext", () => {
   test("re-renders all consumers when it re-renders", async () => {

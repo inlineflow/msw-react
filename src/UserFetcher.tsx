@@ -1,15 +1,15 @@
-import { useGalleryContext } from "./UserGalleryContext";
+import { useUserGalleryAPI } from "./UserGalleryContext";
 import type { UserAvatarScale } from "../types/user";
 
 export const UserFetcher = () => {
-  const { setUserAvatarScales } = useGalleryContext();
+  const { onUpdateUserAvatarScales } = useUserGalleryAPI();
 
   const handleNewUsers = () => {
     const fetchUsers = async () => {
       const res = await fetch("/users/avatars");
       const result = (await res.json()) as UserAvatarScale[];
 
-      setUserAvatarScales(result);
+      onUpdateUserAvatarScales(result);
     };
 
     fetchUsers();
