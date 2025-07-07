@@ -101,7 +101,7 @@ describe("UserGalleryContext", () => {
     expect(MockDataContextConsumer).toHaveBeenCalledTimes(2);
   });
 
-  test("Components using the Context API don't re-render on Data Context changes", async () => {
+  test("Components using the API Provider don't re-render on Data Provider changes", async () => {
     const userFetcherSpy = vi.spyOn(UserFetcherModule, "UserFetcher");
     render(
       <UserGalleryProvider>
