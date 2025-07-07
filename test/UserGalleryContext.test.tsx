@@ -66,6 +66,7 @@ describe("UserGalleryContext", () => {
     render(
       <UserGalleryProvider>
         <MockComponent />
+        <UserFetcherModule.UserFetcher />
       </UserGalleryProvider>
     );
 
@@ -105,14 +106,21 @@ describe("UserGalleryContext", () => {
     render(
       <UserGalleryProvider>
         <UserGallery />
+        <UserFetcherModule.UserFetcher />
       </UserGalleryProvider>
     );
 
     expect(userFetcherSpy.mock.calls.length).toBe(1);
     userEvent.click(await screen.getByText("New Users"));
     await waitFor(() => {
+      expect(userFetcherSpy).toBeCalled();
       expect(userFetcherSpy.mock.calls.length).toBe(1);
     });
+
+    // userEvent.click(await screen.getByText("New Users"));
+    // await waitFor(() => {
+    //   expect(userFetcherSpy.mock.calls.length).toBe(1);
+    // });
   });
 
   // test("re-renders all consumers when it re-renders", async () => {

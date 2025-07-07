@@ -1,5 +1,4 @@
 import { UserAvatar } from "./UserAvatar";
-import { UserFetcher } from "./UserFetcher";
 import { useUserGalleryData } from "./UserGalleryContext";
 
 export const UserGallery = () => {
@@ -14,7 +13,6 @@ export const UserGallery = () => {
           </li>
         ))}
       </ul>
-      <UserFetcher />
     </div>
   );
 };
