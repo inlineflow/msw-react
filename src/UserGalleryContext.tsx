@@ -38,16 +38,6 @@ type Provider = {
 };
 export const UserGalleryDataProvider = ({ children }: Provider) => {
   const [state, dispatch] = useReducer(reducer, {} as State);
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const res = await fetch("/users/avatars");
-      const result = await res.json();
-
-      dispatch({ type: "updateUserAvatarScales", scales: result });
-    };
-
-    fetchUsers();
-  }, []);
 
   const api = useMemo(() => {
     const onUpdateUserAvatarScales = (scales: UserAvatarScale[]) =>
@@ -56,6 +46,18 @@ export const UserGalleryDataProvider = ({ children }: Provider) => {
       dispatch({ type: "updateUserAchievements", achievements: achievements });
 
     return { onUpdateUserAvatarScales, onUpdateUserAchievements };
+  }, []);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const res = await fetch("/users/avatars");
+      const result = await res.json();
+
+      api.onUpdateUserAvatarScales(result);
+      // dispatch({ type: "updateUserAvatarScales", scales: result });
+    };
+
+    fetchUsers();
   }, []);
 
   return (
@@ -68,5 +70,4 @@ export const UserGalleryDataProvider = ({ children }: Provider) => {
 };
 
 export const useUserGalleryData = () => useContext(UserGalleryDataContext);
-// TODO: fix stub
 export const useUserGalleryAPI = () => useContext(UserGalleryAPIContext);

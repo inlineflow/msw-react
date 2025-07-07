@@ -3,6 +3,8 @@ import { describe, expect, test, vi } from "vitest";
 import { UserGalleryDataProvider } from "../src/UserGalleryContext";
 import { UserGallery } from "../src/UserGallery";
 import { UserAvatar } from "../src/UserAvatar";
+import { server } from "./mocks/node";
+import { UserAvatarScale } from "../types/user";
 
 vi.mock("../src/UserAvatar", () => ({
   UserAvatar: vi.fn(() => <div id="UserAvatar"></div>),
@@ -10,6 +12,9 @@ vi.mock("../src/UserAvatar", () => ({
 
 describe("UserGallery", () => {
   test("renders all fetched UserAvatars", async () => {
+    const scales = (await (
+      await fetch("/users/avatars")
+    ).json()) as UserAvatarScale[];
     render(
       <UserGalleryDataProvider>
         <UserGallery />
@@ -20,7 +25,10 @@ describe("UserGallery", () => {
       expect(UserAvatar).toHaveBeenCalled();
     });
 
-    await expect(UserAvatar).toHaveBeenCalledTimes(4);
+    await waitFor(() => {
+      expect(UserAvatar).toHaveBeenCalledTimes(scales.length);
+    });
+    // screen.debug();
   });
 
   test("");

@@ -8,8 +8,8 @@ export const UserGallery = () => {
   return (
     <div>
       <ul>
-        {userAvatarScales.map((scale) => (
-          <li>
+        {userAvatarScales?.map((scale, i) => (
+          <li key={i}>
             <UserAvatar scale={scale} />
           </li>
         ))}
