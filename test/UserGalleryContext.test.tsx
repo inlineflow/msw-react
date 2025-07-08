@@ -9,6 +9,7 @@ import {
 } from "vitest";
 import {
   UserGalleryProvider,
+  useUserGalleryAchievements,
   useUserGalleryAPI,
   useUserGalleryAvatars,
 } from "../src/UserGalleryContext";
@@ -33,7 +34,7 @@ const printNumberOfCalls = (func: Mock) => {
 };
 
 const MockAchievementsConsumer = vi.fn(() => {
-  const userAchievements = useUserGalleryAvatars();
+  const userAchievements = useUserGalleryAchievements();
 
   console.log(userAchievements);
 
@@ -191,44 +192,28 @@ describe("UserGalleryContext", () => {
       <UserGalleryProvider>
         <MockAchievements />
         <MockUserGallery />
+        <UserFetcherModule.UserFetcher />
       </UserGalleryProvider>
     );
 
     await waitFor(() => {
       expect(screen.findByText("Collected 111 trophies")).not.toBeNull();
     });
-    console.log("Achievements: ", MockAchievements.mock.calls.length);
-    console.log(
-      "Achievement Updater: ",
-      MockAchievementsUpdater.mock.calls.length
-    );
-    console.log(
-      "Achievement Consumer: ",
-      MockAchievementsConsumer.mock.calls.length
-    );
-    console.log(
-      "Gallery Consumer: ",
-      MockAchievementsConsumer.mock.calls.length
-    );
     // screen.debug();
     await userEvent.click(screen.getByText("Refresh Achievements"));
     await waitFor(() => {
       screen.findByText("Caught a pokemon");
     });
-    console.log("Achievements: ", MockAchievements.mock.calls.length);
-    console.log(
-      "Achievement Updater: ",
-      MockAchievementsUpdater.mock.calls.length
+    expect(MockAchievementsConsumer.mock.calls.length).toBeGreaterThan(
+      MockUserGallery.mock.calls.length
     );
-    console.log(
-      "Achievement Consumer: ",
-      MockAchievementsConsumer.mock.calls.length
+    await userEvent.click(screen.getByText("New Users"));
+    await waitFor(() => {
+      screen.findByText("Caught a pokemon");
+    });
+    expect(MockAchievementsConsumer.mock.calls.length).toBe(
+      MockUserGallery.mock.calls.length
     );
-    console.log(
-      "Gallery Consumer: ",
-      MockAchievementsConsumer.mock.calls.length
-    );
-    screen.debug();
   });
 
   // test("re-renders all consumers when it re-renders", async () => {
