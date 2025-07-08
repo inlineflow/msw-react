@@ -12,10 +12,29 @@ import {
   UserGalleryProvider,
 } from "../src/UserGalleryContext";
 import * as UserFetcherModule from "../src/UserFetcher";
+import * as UserAchievementsModule from "../src/achievements/UserAchievements";
 import { UserGallery } from "../src/UserGallery";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import * as UserGalleryModule from "../src/UserGallery";
+import {
+  cleanup,
+  findByText,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { UserAvatarScale } from "../types/user";
+
+vi.mock("../src/UserAchievements", async (importOriginal) => {
+  const x = await importOriginal();
+  return {
+    ...x,
+    UserAchievements: 1,
+    UserAchievementsDisplay: vi.fn(() => (
+      <div data-testid="UserAchievementsDisplay"></div>
+    )),
+  };
+});
 
 const printNumberOfCalls = (func: Mock) => {
   console.log(func.mock.calls.length);
@@ -127,6 +146,51 @@ describe("UserGalleryContext", () => {
     // await waitFor(() => {
     //   expect(userFetcherSpy.mock.calls.length).toBe(1);
     // });
+  });
+
+  test("If 2 consumers share the state, both of them re-render on change", async () => {
+    const displayMock = vi.fn();
+    const userAchievementsDisplaySpy = vi
+      .spyOn(UserAchievementsModule, "UserAchievementsDisplay")
+      .mockImplementation(() => {
+        displayMock();
+        return (
+          <div data-testid="UserAchievementsDisplay">
+            Collected 111 trophies
+          </div>
+        );
+      });
+    // const userAchievementsFetcherSpy = vi.spyOn(
+    //   UserAchievementsModule,
+    //   "UserAchievementsFetcher"
+    // );
+    const userGallerySpy = vi.spyOn(UserGalleryModule, "UserGallery");
+    // const userAchievementsSpy = vi.spyOn(
+    //   UserAchievementsModule,
+    //   "UserAchievements"
+    // );
+
+    render(
+      <UserGalleryProvider>
+        <UserGallery />
+        <UserFetcherModule.UserFetcher />
+        <UserAchievementsModule.UserAchievements />
+      </UserGalleryProvider>
+    );
+
+    // await waitFor(() => {
+    //   screen.getByText("Collected 111 trophies");
+    // });
+    // userEvent.click(await screen.findByText("Refresh Achievements"));
+    // await waitFor(() => {
+    //   expect(userAchievementsDisplaySpy).toHaveBeenCalled();
+    // });
+    await waitFor(() => {
+      screen.getByTestId("UserAchievementsDisplay");
+    });
+    console.log(userAchievementsDisplaySpy.mock.calls);
+    console.log(userGallerySpy.mock.calls);
+    screen.debug();
   });
 
   // test("re-renders all consumers when it re-renders", async () => {

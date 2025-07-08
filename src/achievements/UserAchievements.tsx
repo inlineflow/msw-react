@@ -1,16 +1,6 @@
 import { useCallback, useEffect } from "react";
-import { useUserGalleryAPI, useUserGalleryData } from "./UserGalleryContext";
-
-export const UserAchievementsDisplay = () => {
-  const { userAchievements } = useUserGalleryData();
-  return (
-    <div>
-      {userAchievements.map((a) => (
-        <li key={a}>{a}</li>
-      ))}
-    </div>
-  );
-};
+import { useUserGalleryAPI } from "../UserGalleryContext";
+import { UserAchievementsDisplay } from "./UserAchievementsDisplay";
 
 export const UserAchievementsFetcher = () => {
   const { onUpdateUserAchievements } = useUserGalleryAPI();
@@ -28,7 +18,7 @@ export const UserAchievementsFetcher = () => {
 
   return (
     <div>
-      <button onClick={fetchAchievements}>Refresh Achievements</button>
+      <button onClick={() => fetchAchievements()}>Refresh Achievements</button>
     </div>
   );
 };
