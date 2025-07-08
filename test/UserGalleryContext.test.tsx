@@ -34,9 +34,9 @@ const delay = async (ms: number | undefined) => {
 };
 
 describe("UserGalleryContext", () => {
-  afterEach(() => {
-    cleanup();
-  });
+  // afterEach(() => {
+  //   cleanup();
+  // });
 
   test("renders user gallery with default fetched value", async () => {
     const scales = (await (

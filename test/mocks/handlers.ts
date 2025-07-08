@@ -25,6 +25,15 @@ export const handlers = [
     const resp = HttpResponse.json<UserAvatarScale[]>([0.1, 0.2, 0.1, 0.3]);
     return resp;
   }),
+  http.get("/users/achievements", () => {
+    const resp = HttpResponse.json([
+      "Finished course X",
+      "Logged in for 300 days",
+      "Collected 111 trophies",
+    ]);
+
+    return resp;
+  }),
   http.get<{ id: string }, never, User>("/users/:id", ({ params }) => {
     const { id } = params;
     const userId = parseInt(id);

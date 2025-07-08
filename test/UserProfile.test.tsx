@@ -22,13 +22,13 @@ import { http, HttpResponse } from "msw";
 import { User } from "../types/user";
 
 describe("UserProfile", () => {
-  beforeEach(() => {
-    // server.resetHandlers();
-  });
+  // beforeEach(() => {
+  //   // server.resetHandlers();
+  // });
 
-  afterEach(() => {
-    cleanup();
-  });
+  // afterEach(() => {
+  //   cleanup();
+  // });
 
   test("initially renders a loading message", () => {
     render(<UserProfile id={1} />);
