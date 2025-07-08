@@ -1,8 +1,8 @@
 import { UserAvatar } from "./UserAvatar";
-import { useUserGalleryData } from "./UserGalleryContext";
+import { useUserGalleryAvatars } from "./UserGalleryContext";
 
 export const UserGallery = () => {
-  const { userAvatarScales } = useUserGalleryData();
+  const userAvatarScales = useUserGalleryAvatars();
 
   return (
     <div>

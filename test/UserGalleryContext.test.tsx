@@ -8,11 +8,13 @@ import {
   vi,
 } from "vitest";
 import {
-  useUserGalleryData,
   UserGalleryProvider,
+  useUserGalleryAPI,
+  useUserGalleryAvatars,
 } from "../src/UserGalleryContext";
 import * as UserFetcherModule from "../src/UserFetcher";
-import * as UserAchievementsModule from "../src/achievements/UserAchievements";
+// import * as UserAchievementsModule from "../src/achievements/UserAchievements";
+import { UserAchievements } from "../src/achievements/UserAchievements";
 import { UserGallery } from "../src/UserGallery";
 import * as UserGalleryModule from "../src/UserGallery";
 import {
@@ -24,24 +26,60 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { UserAvatarScale } from "../types/user";
-
-vi.mock("../src/UserAchievements", async (importOriginal) => {
-  const x = await importOriginal();
-  return {
-    ...x,
-    UserAchievements: 1,
-    UserAchievementsDisplay: vi.fn(() => (
-      <div data-testid="UserAchievementsDisplay"></div>
-    )),
-  };
-});
+import { useCallback, useEffect } from "react";
 
 const printNumberOfCalls = (func: Mock) => {
   console.log(func.mock.calls.length);
 };
 
-const MockDataContextConsumer = vi.fn(() => {
-  const { userAvatarScales } = useUserGalleryData();
+const MockAchievementsConsumer = vi.fn(() => {
+  const userAchievements = useUserGalleryAvatars();
+
+  console.log(userAchievements);
+
+  return (
+    <div data-testid="MockAchievementsConsumer">
+      <ul>
+        {userAchievements.map((a) => (
+          <li>{a}</li>
+        ))}
+      </ul>
+    </div>
+  );
+});
+
+const MockAchievementsUpdater = vi.fn(() => {
+  const { onUpdateUserAchievements } = useUserGalleryAPI();
+
+  const fetchAchievements = useCallback(async (id: number = 1) => {
+    const resp = await fetch(`/users/achievements/${id}`);
+    const result = (await resp.json()) as string[];
+
+    console.log("Achievements in fetch: ", result);
+
+    onUpdateUserAchievements(result);
+  }, []);
+
+  useEffect(() => {
+    fetchAchievements();
+  }, []);
+
+  return (
+    <div data-testid="MockAchievementsUpdater">
+      <button onClick={() => fetchAchievements(2)}>Refresh Achievements</button>
+    </div>
+  );
+});
+
+const MockAchievements = vi.fn(() => (
+  <div>
+    <MockAchievementsConsumer />
+    <MockAchievementsUpdater />
+  </div>
+));
+
+const MockUserGallery = vi.fn(() => {
+  const userAvatarScales = useUserGalleryAvatars();
 
   return <UserGallery />;
 });
@@ -64,12 +102,12 @@ describe("UserGalleryContext", () => {
 
     render(
       <UserGalleryProvider>
-        <MockDataContextConsumer />
+        <MockUserGallery />
       </UserGalleryProvider>
     );
 
     await waitFor(() => {
-      expect(MockDataContextConsumer).toHaveBeenCalled();
+      expect(MockUserGallery).toHaveBeenCalled();
     });
 
     const actual = Array.from(document.querySelectorAll("li")).map(
@@ -109,15 +147,15 @@ describe("UserGalleryContext", () => {
   test("Component does re-render if it's a context consumer", async () => {
     render(
       <UserGalleryProvider>
-        <MockDataContextConsumer />
+        <MockUserGallery />
       </UserGalleryProvider>
     );
 
     await waitFor(() => {
-      expect(MockDataContextConsumer).toHaveBeenCalled();
+      expect(MockUserGallery).toHaveBeenCalled();
     });
 
-    expect(MockDataContextConsumer).toHaveBeenCalledTimes(2);
+    expect(MockUserGallery).toHaveBeenCalledTimes(2);
   });
 
   test("Components using the API Provider don't re-render on Data Provider changes", async () => {
@@ -149,47 +187,47 @@ describe("UserGalleryContext", () => {
   });
 
   test("If 2 consumers share the state, both of them re-render on change", async () => {
-    const displayMock = vi.fn();
-    const userAchievementsDisplaySpy = vi
-      .spyOn(UserAchievementsModule, "UserAchievementsDisplay")
-      .mockImplementation(() => {
-        displayMock();
-        return (
-          <div data-testid="UserAchievementsDisplay">
-            Collected 111 trophies
-          </div>
-        );
-      });
-    // const userAchievementsFetcherSpy = vi.spyOn(
-    //   UserAchievementsModule,
-    //   "UserAchievementsFetcher"
-    // );
-    const userGallerySpy = vi.spyOn(UserGalleryModule, "UserGallery");
-    // const userAchievementsSpy = vi.spyOn(
-    //   UserAchievementsModule,
-    //   "UserAchievements"
-    // );
-
     render(
       <UserGalleryProvider>
-        <UserGallery />
-        <UserFetcherModule.UserFetcher />
-        <UserAchievementsModule.UserAchievements />
+        <MockAchievements />
+        <MockUserGallery />
       </UserGalleryProvider>
     );
 
-    // await waitFor(() => {
-    //   screen.getByText("Collected 111 trophies");
-    // });
-    // userEvent.click(await screen.findByText("Refresh Achievements"));
-    // await waitFor(() => {
-    //   expect(userAchievementsDisplaySpy).toHaveBeenCalled();
-    // });
     await waitFor(() => {
-      screen.getByTestId("UserAchievementsDisplay");
+      expect(screen.findByText("Collected 111 trophies")).not.toBeNull();
     });
-    console.log(userAchievementsDisplaySpy.mock.calls);
-    console.log(userGallerySpy.mock.calls);
+    console.log("Achievements: ", MockAchievements.mock.calls.length);
+    console.log(
+      "Achievement Updater: ",
+      MockAchievementsUpdater.mock.calls.length
+    );
+    console.log(
+      "Achievement Consumer: ",
+      MockAchievementsConsumer.mock.calls.length
+    );
+    console.log(
+      "Gallery Consumer: ",
+      MockAchievementsConsumer.mock.calls.length
+    );
+    // screen.debug();
+    await userEvent.click(screen.getByText("Refresh Achievements"));
+    await waitFor(() => {
+      screen.findByText("Caught a pokemon");
+    });
+    console.log("Achievements: ", MockAchievements.mock.calls.length);
+    console.log(
+      "Achievement Updater: ",
+      MockAchievementsUpdater.mock.calls.length
+    );
+    console.log(
+      "Achievement Consumer: ",
+      MockAchievementsConsumer.mock.calls.length
+    );
+    console.log(
+      "Gallery Consumer: ",
+      MockAchievementsConsumer.mock.calls.length
+    );
     screen.debug();
   });
 

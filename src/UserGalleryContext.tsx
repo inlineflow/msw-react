@@ -12,15 +12,21 @@ type State = {
   userAchievements: string[];
 };
 
+// type UserAvatarScalesState = { userAvatarScales: UserAvatarScale[] };
+// type UserAchievementsState = { userAchievements: string[] };
+
 type API = {
   onUpdateUserAvatarScales: (scales: UserAvatarScale[]) => void;
   onUpdateUserAchievements: (achievements: string[]) => void;
 };
 
-const UserGalleryDataContext = createContext<State>({
-  userAvatarScales: [],
-  userAchievements: [],
-});
+const UserGalleryAvatarContext = createContext<State["userAvatarScales"]>(
+  {} as State["userAvatarScales"]
+);
+const UserGalleryAchievementsContext = createContext<State["userAchievements"]>(
+  {} as State["userAchievements"]
+);
+
 const UserGalleryAPIContext = createContext({} as API);
 
 type Actions =
@@ -68,12 +74,16 @@ export const UserGalleryProvider = ({ children }: Provider) => {
 
   return (
     <UserGalleryAPIContext.Provider value={api}>
-      <UserGalleryDataContext.Provider value={state}>
-        {children}
-      </UserGalleryDataContext.Provider>
+      <UserGalleryAvatarContext.Provider value={state.userAvatarScales}>
+        <UserGalleryAchievementsContext.Provider value={state.userAchievements}>
+          {children}
+        </UserGalleryAchievementsContext.Provider>
+      </UserGalleryAvatarContext.Provider>
     </UserGalleryAPIContext.Provider>
   );
 };
 
-export const useUserGalleryData = () => useContext(UserGalleryDataContext);
+export const useUserGalleryAvatars = () => useContext(UserGalleryAvatarContext);
+export const useUserGalleryAchievements = () =>
+  useContext(UserGalleryAchievementsContext);
 export const useUserGalleryAPI = () => useContext(UserGalleryAPIContext);

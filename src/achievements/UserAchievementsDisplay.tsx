@@ -1,7 +1,7 @@
-import { useUserGalleryData } from "../UserGalleryContext";
+import { useUserGalleryAchievements } from "../UserGalleryContext";
 
 export const UserAchievementsDisplay = () => {
-  const { userAchievements } = useUserGalleryData();
+  const userAchievements = useUserGalleryAchievements();
   return (
     <div>
       {userAchievements.map((a) => (

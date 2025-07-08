@@ -25,7 +25,11 @@ export const handlers = [
     const resp = HttpResponse.json<UserAvatarScale[]>([0.1, 0.2, 0.1, 0.3]);
     return resp;
   }),
-  http.get("/users/achievements", () => {
+  http.get("/users/achievements/2", () => {
+    const resp = HttpResponse.json(["Caught a pokemon", "Made a playthrough"]);
+    return resp;
+  }),
+  http.get("/users/achievements/1", () => {
     const resp = HttpResponse.json([
       "Finished course X",
       "Logged in for 300 days",
