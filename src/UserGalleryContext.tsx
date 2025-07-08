@@ -12,9 +12,6 @@ type State = {
   userAchievements: string[];
 };
 
-// type UserAvatarScalesState = { userAvatarScales: UserAvatarScale[] };
-// type UserAchievementsState = { userAchievements: string[] };
-
 type API = {
   onUpdateUserAvatarScales: (scales: UserAvatarScale[]) => void;
   onUpdateUserAchievements: (achievements: string[]) => void;
